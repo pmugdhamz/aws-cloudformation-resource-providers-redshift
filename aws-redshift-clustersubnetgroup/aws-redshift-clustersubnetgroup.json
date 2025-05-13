@@ -36,13 +36,10 @@
             "description": "The list of VPC subnet IDs",
             "type": "array",
             "insertionOrder": false,
+            "minItems": 1,
             "maxItems": 20,
             "items": {
-                "type": "string",
-                "relationshipRef": {
-                    "typeName": "AWS::EC2::Subnet",
-                    "propertyPath": "/properties/SubnetId"
-                }
+                "type": "string"
             }
         },
         "Tags": {
@@ -68,16 +65,20 @@
     "primaryIdentifier": [
         "/properties/ClusterSubnetGroupName"
     ],
-    "readOnlyProperties": [
+    "createOnlyProperties": [
         "/properties/ClusterSubnetGroupName"
     ],
-    "writeOnlyProperties": [
-        "/properties/Tags",
-        "/properties/Tags/*/Key",
-        "/properties/Tags/*/Value"
-    ],
     "tagging": {
-        "taggable": true
+        "taggable": true,
+        "tagOnCreate": true,
+        "tagUpdatable": true,
+        "cloudFormationSystemTags": false,
+        "tagProperty": "/properties/Tags",
+        "permissions": [
+            "redshift:DescribeTags",
+            "redshift:CreateTags",
+            "redshift:DeleteTags"
+        ]
     },
     "handlers": {
         "create": {
@@ -86,6 +87,7 @@
                 "redshift:CreateTags",
                 "redshift:DescribeClusterSubnetGroups",
                 "redshift:DescribeTags",
+                "redshift:CreateTags",
                 "ec2:AllocateAddress",
                 "ec2:AssociateAddress",
                 "ec2:AttachNetworkInterface",
@@ -138,6 +140,7 @@
                 "redshift:DeleteClusterSubnetGroup",
                 "redshift:DescribeClusterSubnetGroups",
                 "redshift:DescribeTags",
+                "redshift:DeleteTags",
                 "ec2:AllocateAddress",
                 "ec2:AssociateAddress",
                 "ec2:AttachNetworkInterface",
