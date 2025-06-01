@@ -26,6 +26,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static software.amazon.redshift.clustersubnetgroup.TestUtils.*;
+import static software.amazon.redshift.clustersubnetgroup.TestUtils.MODEL_WITH_TAGS;
 
 @ExtendWith(MockitoExtension.class)
 public class CreateHandlerTest extends AbstractTestBase {

@@ -22,6 +22,13 @@ public class ReadHandler extends BaseHandlerStd {
 
         this.logger = logger;
         final ResourceModel model = request.getDesiredResourceState();
+
+        // Validate primary identifier
+        if (model == null || model.getClusterSubnetGroupName() == null) {
+            return ProgressEvent.failed(null, callbackContext, HandlerErrorCode.NotFound,
+                    "ClusterSubnetGroupName is required");
+        }
+
         final String resourceName = String.format("arn:%s:redshift:%s:%s:subnetgroup:%s",
                 request.getAwsPartition(),
                 request.getRegion(),
@@ -38,7 +45,15 @@ public class ReadHandler extends BaseHandlerStd {
                             }
                             return ProgressEvent.defaultFailureHandler(exception, HandlerErrorCode.GeneralServiceException);
                         })
-                        .done(awsResponse -> ProgressEvent.progress(Translator.translateFromReadResponse(awsResponse), callbackContext)))
+                        .done(awsResponse -> {
+                            ResourceModel updatedModel = Translator.translateFromReadResponse(awsResponse);
+                            // Ensure primaryIdentifier is set
+                            if (updatedModel.getClusterSubnetGroupName() == null) {
+                                updatedModel.setClusterSubnetGroupName(
+                                        model.getClusterSubnetGroupName());
+                            }
+                            return ProgressEvent.progress(updatedModel, callbackContext);
+                        }))
                 .then(progress -> proxy.initiate(String.format("%s::Read::Tags", CALL_GRAPH_TYPE_NAME), proxyClient, progress.getResourceModel(), callbackContext)
                         .translateToServiceRequest(rm -> Translator.translateToReadTagsRequest(resourceName))
                         .makeServiceCall(this::readTags)  // Using inherited readTags method

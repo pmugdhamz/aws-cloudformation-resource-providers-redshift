@@ -61,7 +61,10 @@ public class CreateHandler extends BaseHandlerStd {
                         .handleError(this::createClusterSubnetGroupErrorHandler)
                         .progress()
                 )
-                .then(progress -> new ReadHandler().handleRequest(proxy, request, callbackContext, proxyClient, logger));
+                .then(progress -> {
+                    model.setClusterSubnetGroupName(progress.getResourceModel().getClusterSubnetGroupName());
+                    return new ReadHandler().handleRequest(proxy, request, callbackContext, proxyClient, logger);
+                });
     }
 
     private CreateClusterSubnetGroupResponse createClusterSubnetGroup(
